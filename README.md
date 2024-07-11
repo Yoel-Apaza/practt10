@@ -27,3 +27,4 @@ Para ejecutar el proyecto:
 2. Ejecuta el archivo `visualizacion_3d.py`:
    ```bash
    python visualizacion_3d.py
+link de streamlit: https://practt10-ehmeyhzcpw3svzgwdgt3n3.streamlit.app/
