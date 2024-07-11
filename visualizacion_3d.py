@@ -3,10 +3,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import plotly.graph_objects as go
 import json
-
 import streamlit as st
-
-
 
 # Clase base para las superficies 3D
 class Superficie3D:
@@ -77,7 +74,7 @@ class Visualizador3DPlotly(Visualizador3D):
         x, y, z = self.superficie.generar_datos()
         fig = go.Figure(data=[go.Surface(z=z, x=x, y=y)])
         fig.update_layout(title='Superficie 3D', autosize=False, width=800, height=800)
-        fig.show()
+        st.plotly_chart(fig)
 
 # Funciones para guardar y cargar configuraciones
 def guardar_configuracion(superficie, filename="configuracion.json"):
@@ -111,78 +108,52 @@ def cargar_configuracion(filename="configuracion.json"):
         raise ValueError("Tipo de superficie no válido.")
 
 # Interfaz gráfica para seleccionar y visualizar superficies
-class AplicacionVisualizacion3D:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Visualización de Superficies 3D")
-        self.crear_widgets()
+def main():
+    st.title("Visualización de Superficies 3D")
 
-    def crear_widgets(self):
-        frame = ttk.Frame(self.root, padding="10 10 10 10")
-        frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+    tipo_superficie = st.selectbox("Seleccione el tipo de superficie:",
+                                   ("Plano", "Paraboloide", "Sinusoide", "Hiperboloide"))
+    parametro = st.slider("Ajustar parámetro:", min_value=-5.0, max_value=5.0, value=1.0, step=0.1)
 
-        self.tipo_superficie = tk.StringVar()
-        self.parametro = tk.DoubleVar()
-
-        ttk.Label(frame, text="Seleccione el tipo de superficie:").grid(row=0, column=0, columnspan=2)
-        ttk.Radiobutton(frame, text="Plano", variable=self.tipo_superficie, value="Plano").grid(row=1, column=0, sticky=tk.W)
-        ttk.Radiobutton(frame, text="Paraboloide", variable=self.tipo_superficie, value="Paraboloide").grid(row=2, column=0, sticky=tk.W)
-        ttk.Radiobutton(frame, text="Sinusoide", variable=self.tipo_superficie, value="Sinusoide").grid(row=3, column=0, sticky=tk.W)
-        ttk.Radiobutton(frame, text="Hiperboloide", variable=self.tipo_superficie, value="Hiperboloide").grid(row=4, column=0, sticky=tk.W)
-
-        ttk.Label(frame, text="Ingrese el parámetro:").grid(row=5, column=0)
-        ttk.Entry(frame, textvariable=self.parametro).grid(row=5, column=1)
-
-        ttk.Button(frame, text="Visualizar", command=self.visualizar).grid(row=6, column=0, columnspan=2)
-        ttk.Button(frame, text="Guardar Configuración", command=self.guardar).grid(row=7, column=0, columnspan=2)
-        ttk.Button(frame, text="Cargar Configuración", command=self.cargar).grid(row=8, column=0, columnspan=2)
-
-    def visualizar(self):
-        tipo = self.tipo_superficie.get()
-        parametro = self.parametro.get()
-
-        if tipo == "Plano":
+    if st.button("Visualizar"):
+        if tipo_superficie == "Plano":
             superficie = Plano((-5, 5), (-5, 5), parametro)
-        elif tipo == "Paraboloide":
+        elif tipo_superficie == "Paraboloide":
             superficie = Paraboloide((-5, 5), (-5, 5), parametro)
-        elif tipo == "Sinusoide":
+        elif tipo_superficie == "Sinusoide":
             superficie = Sinusoide((-5, 5), (-5, 5), parametro)
-        elif tipo == "Hiperboloide":
+        elif tipo_superficie == "Hiperboloide":
             superficie = Hiperboloide((-5, 5), (-5, 5), parametro)
         else:
-            print("Opción no válida.")
+            st.error("Opción no válida.")
             return
 
         visualizador = Visualizador3DPlotly(superficie)
         visualizador.mostrar_con_plotly()
 
-    def guardar(self):
-        tipo = self.tipo_superficie.get()
-        parametro = self.parametro.get()
-
-        if tipo == "Plano":
+    if st.button("Guardar Configuración"):
+        if tipo_superficie == "Plano":
             superficie = Plano((-5, 5), (-5, 5), parametro)
-        elif tipo == "Paraboloide":
+        elif tipo_superficie == "Paraboloide":
             superficie = Paraboloide((-5, 5), (-5, 5), parametro)
-        elif tipo == "Sinusoide":
+        elif tipo_superficie == "Sinusoide":
             superficie = Sinusoide((-5, 5), (-5, 5), parametro)
-        elif tipo == "Hiperboloide":
+        elif tipo_superficie == "Hiperboloide":
             superficie = Hiperboloide((-5, 5), (-5, 5), parametro)
         else:
-            print("Opción no válida.")
+            st.error("Opción no válida.")
             return
 
         guardar_configuracion(superficie)
+        st.success("Configuración guardada")
 
-    def cargar(self):
+    if st.button("Cargar Configuración"):
         try:
             superficie = cargar_configuracion()
-            self.tipo_superficie.set(superficie.__class__.__name__)
-            self.parametro.set(superficie.parametro)
+            st.write(f"Superficie cargada: {superficie.__class__.__name__}")
+            st.write(f"Parámetro: {superficie.parametro}")
         except Exception as e:
-            print(f"Error al cargar configuración: {e}")
+            st.error(f"Error al cargar configuración: {e}")
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = AplicacionVisualizacion3D(root)
-    root.mainloop()
+    main()
