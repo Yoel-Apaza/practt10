@@ -2,8 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import plotly.graph_objects as go
-import tkinter as tk
-from tkinter import ttk
 import json
 
 # Clase base para las superficies 3D
