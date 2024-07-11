@@ -4,6 +4,10 @@ from mpl_toolkits.mplot3d import Axes3D
 import plotly.graph_objects as go
 import json
 
+import streamlit as st
+
+
+
 # Clase base para las superficies 3D
 class Superficie3D:
     def __init__(self, x_range, y_range):
